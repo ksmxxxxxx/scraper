@@ -19,31 +19,26 @@ get '/view_eventlist' do
 
   html = "<h1>イベント一覧</h1>"
 
-
-#  date = ""
-#  x.xpath("//table[5]/tr").each do |tr|
-#    if !tr.attributes["bgcolor"].nil? && tr.attributes["bgcolor"].value == "#ffc6c6"
-#      date_text = tr.children.search('td').first.children.children.text
-#      puts date_text
-#    else
-#      url = tr.children.search('td').first.children.search('a').attr('href').value rescue "(no link)"
-#      title = tr.children.search('td').first.children.search('b').text rescue "(no title)"
-#      puts "　#{title} -> #{url}"
-#    end
-#  end
-
   event_location = ""
   event_url = ""
   event_title =""
+  deadline_date = ""
+  regist_space = ""
+  entry_fee = ""
 
   doc.xpath("//table[5]/tr").each do |tr|
     if !tr.attributes["bgcolor"].nil? && tr.attributes["bgcolor"].value == "#ffc6c6"
       event_location = tr.children.search("td").first.children.search("font").children.search("b").text
       html << "<h2>#{event_location}</h2>"
+    elsif tr.children.search("td[rowspan]")
+      regist_space = tr.children.search("td:nth-children(2)").text rescue "(no data)"
+      html << "<p>募集SP：#{regist_space}</p>"
 #     else
-#       event_url = tr.children.search('td').first.children.('a').attr('href').value rescue "(no link)"
+#       entry_fee = tr.children.search("td:nth-child(3)").text rescue "(no data)"
+#       deadline_date = tr.children.search("td:nth-child(4)").text rescue "(no data)"
+#       event_url = tr.children.search("td").first.children.search('a').attr('href').value rescue "(no link)"
 #       event_title = tr.children.search('td').first.children.search('b').text rescue "(no title)"
-#       html << "<p><a href=#{event_url}>#{event_title}</a></p>"
+#       html << "<p><a href=#{event_url}>#{event_title}</a><br>参加費: #{entry_fee}&nbsp;最終締切: #{deadline_date}</p>"
     end
   end
   return html
