@@ -27,5 +27,5 @@ event_title =""
 doc.xpath("//*[@id=\"left\"]").each do |eventlist|
   puts eventlist.xpath("//td[@class=\"place\"]").text
   puts eventlist.xpath("//td[@class=\"title\"]").text
-  db.execute "INSERT INTO event values ( ?, ? );", ["#{eventlist.xpath("//td[@class=\"place\"]").text}", "#{title.xpath("//td=[@class=\"title\"])"}"]
+  db.execute "INSERT INTO event values ( ?, ? );", ["#{eventlist.xpath("//td[@class=\"place\"]").text}", "#{title.xpath("//td=[@class=\"title\"]")}"]
 end
