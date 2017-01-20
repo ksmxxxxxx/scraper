@@ -4,12 +4,8 @@ require "robotex"
 require "sinatra"
 require "sinatra/reloader"
 
-def event_location(doc)
-  doc.xpath("//table[5]/tr").search("td").first.search("b").text
-end
-
-def regist_space(doc)
-  doc.xpath("//table[5]/tr").search("td")[2].search("b").text
+def event_header(doc)
+  doc.xpath("//table[5]/tr").search("tr").first.search("b").map{|attr|attr.text}
 end
 
 get '/view_akaboo' do
@@ -27,9 +23,8 @@ get '/view_akaboo' do
   doc = Nokogiri::HTML.parse(html, nil, charset)
 
   html = "<h1>イベント一覧</h1>"
-  
-  puts event_location(doc)
-  puts regist_space(doc)
+
+  puts event_header(doc)
 
   return html
 end
