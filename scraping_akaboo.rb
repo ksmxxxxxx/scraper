@@ -33,7 +33,7 @@ get '/view_akaboo' do
 
   def regist_space
     $doc.xpath("//table[5]/tr").each do |tr|
-      if tr.next.attributes["bgcolor"].nil?
+      if tr.attributes["height"].value == "40"
         @space_cont = tr.children.search("td[@rowspan]").text
         return @space_cont
       end
