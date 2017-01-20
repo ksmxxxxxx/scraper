@@ -5,21 +5,11 @@ require "sinatra"
 require "sinatra/reloader"
 
 def event_location(doc)
-  doc.xpath("//table[5]/tr").each do |tr|
-    if !tr.attributes["bgcolor"].nil? && tr.attributes["bgcolor"].value == "#ffc6c6"
-      location = tr.children.search("td").first.children.search("font").children.search("b").text
-      return location
-    end
-  end
+  doc.xpath("//table[5]/tr").search("td").first.search("b").text
 end
 
 def regist_space(doc)
-  doc.xpath("//table[5]/tr").each do |tr|
-    if tr.attributes["height"].value == "40"
-      space_cont = tr.children.search("td[@rowspan]").text
-      return space_cont
-    end
-  end
+  doc.xpath("//table[5]/tr").search("td")[2].search("b").text
 end
 
 get '/view_akaboo' do
