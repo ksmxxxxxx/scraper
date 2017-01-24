@@ -4,8 +4,19 @@ require "robotex"
 require "sinatra"
 require "sinatra/reloader"
 
-def event_header(doc)
-  doc.xpath("//table[5]/tr").search("tr").first.search("b").map{|attr|attr.text}
+# 会場
+def event_place(doc)
+  doc.xpath("//table[5]/tr[@bgcolor='#ffc6c6']").search("td").search("font").search("b").text
+end
+
+# 会場別の募集スペース
+def event_space(doc)
+  doc.xpath("//table[5]/tr[@bgcolor='#ffc6c6']/preceding").search("td:nth-last-child(7)").text
+end
+
+# イベントタイトル
+def event_title(doc)
+  doc.xpath("//table[5]/tr").search("td[@bgcolor='#FFEBEB']").text
 end
 
 get '/view_akaboo' do
@@ -24,7 +35,9 @@ get '/view_akaboo' do
 
   html = "<h1>イベント一覧</h1>"
 
-  puts event_header(doc)
+puts event_place(doc)
+puts event_space(doc)
+puts event_title(doc)
 
   return html
 end
