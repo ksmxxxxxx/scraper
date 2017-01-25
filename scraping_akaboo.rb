@@ -1,33 +1,10 @@
 require "open-uri"
 require "nokogiri"
 
-require 'pp'
-
-class Table
-  def initialize(table)
-    @table = table
-  end
-
-  def header?
-    @table.attributes.has_key?('bgcolor')
-  end
-
-  def data?
-    !header?
-  end
-
-  def line
-    if header?
-      @table.search("td").search("b").map{|attr|attr.text}
-    else
-      @table.search("td").map{|attr|attr.text}
-    end
-  end
-end
 
 class AkabooScraping
-  def initialize(url)
-    @url = url
+  def url
+    'http://www.akaboo.jp/event/'
   end
 
   def user_agent
@@ -35,23 +12,74 @@ class AkabooScraping
   end
 
   def read
-    open(@url, "User-Agent"=>user_agent) do |f|
+    open(url, "User-Agent"=>user_agent) do |f|
       charset = f.charset
       Nokogiri::HTML.parse(f.read, nil, charset)
     end
   end
-end
 
-url = 'http://www.akaboo.jp/event/'
-scraping = AkabooScraping.new(url)
+  def tables
+    all_tables = []
+    tables = {}
+    rowspan = nil
+    date = nil
+    local = nil
+    header = [:date, :location, :bosyu, :sankahi, :edit_limit_date, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
 
-lines = []
-scraping.read.xpath("//table[5]").search("tr").each do |table|
-  table = Table.new(table)
-  if table.header?
-    lines << [:header, table.line]
-  else
-    lines << [:body, table.line]
+    read.xpath("//table[5]").search("tr").each do |table|
+      table = Table.new(table)
+      if table.header?
+        all_tables << tables if tables.size.nonzero?
+        tables = []
+        rowspan = nil
+        date = table.line[0].split(/\s/)[0]
+        local = table.line[0].split(/\s/)[1]
+        next
+      end
+
+      if table.data?
+        line = table.line
+        if line.size == 8
+          rowspan = line[1]
+        else
+          line = [line[0], rowspan] + line[1..-1]
+        end
+        line = [[date, local] + line].flatten
+
+        tables << Hash[*(header.zip(line).flatten)]
+      end
+    end
+
+    return all_tables
+  end
+
+  class Table
+    def initialize(table)
+      @table = table
+    end
+
+    def header?
+      @table.attributes.has_key?('bgcolor')
+    end
+
+    def data?
+      !header?
+    end
+
+    def line
+      if header?
+        @table.search("td").search("b").map{|attr|attr.text}
+      else
+        @table.search("td").map{|attr|attr.text}
+      end
+    end
   end
 end
-pp lines
+
+scraping = AkabooScraping.new
+scraping.tables.each do |table|
+  table.each do |line|
+    p line
+  end
+  puts ''
+end
