@@ -19,9 +19,8 @@ doc = Nokogiri::HTML.parse(html, nil, charset)
 # 会場
 def event_data(doc)
 
-  data = doc.xpath("//table[5]").map{|attr|attr.text}
-  p data[0]
-
+  data = doc.xpath("//table[5]/tr/td").map{|attr|attr.text}
+  p data[2]
 end
 
   puts event_data(doc)
