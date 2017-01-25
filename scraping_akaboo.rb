@@ -25,18 +25,28 @@ class Table
   end
 end
 
-url = 'http://www.akaboo.jp/event/'
-user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.63 Safari/537.36'
-charset = nil
-html = open(url, "User-Agent" => user_agent) do |f|
-  charset = f.charset
-  f.read
+class AkabooScraping
+  def initialize(url)
+    @url = url
+  end
+
+  def user_agent
+    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.63 Safari/537.36'
+  end
+
+  def read
+    open(@url, "User-Agent"=>user_agent) do |f|
+      charset = f.charset
+      Nokogiri::HTML.parse(f.read, nil, charset)
+    end
+  end
 end
 
-doc = Nokogiri::HTML.parse(html, nil, charset)
+url = 'http://www.akaboo.jp/event/'
+scraping = AkabooScraping.new(url)
 
 lines = []
-doc.xpath("//table[5]").search("tr").each do |table|
+scraping.read.xpath("//table[5]").search("tr").each do |table|
   table = Table.new(table)
   if table.header?
     lines << [:header, table.line]
