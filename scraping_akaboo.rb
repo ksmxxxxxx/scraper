@@ -45,7 +45,7 @@ class AkabooScraping
         else
           line = [line[0], rowspan] + line[1..-1]
         end
-        line = [[date, local,] + line].flatten
+        line = [[date, local] + line].flatten
 
         tables << Hash[*(header.zip(line).flatten)]
       end
