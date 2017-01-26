@@ -34,7 +34,7 @@ class AkabooScraping
         rowspan = nil
         date = table.line[0].split(/\s/)[0]
         local = table.line[0].split(/\s/)[1]
-        uri = table.children.search("td/a[@href]").text.split(/\s/)[4]
+        uri = table.link[0].split(/\s/)[4]
         next
       end
 
@@ -73,6 +73,10 @@ class AkabooScraping
       else
         @table.search("td").map{|attr|attr.text}
       end
+    end
+
+    def link
+      @table.search("td/a[@href]").map{|attr|attr.text}
     end
   end
 end
