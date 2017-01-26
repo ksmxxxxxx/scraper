@@ -27,8 +27,8 @@ class AkabooScraping
     uri = nil
     header = [:date, :location, :title, :uri, :regist_cout, :fee, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
 
-    read.xpath("//table[5]").search("tr").each do |table|
-      table = Table.new(table)
+    read.xpath("//table[5]").search("tr").each do |t|
+      table = Table.new(t)
       if table.header?
         all_tables << tables if tables.size.nonzero?
         tables = []
@@ -74,6 +74,21 @@ class AkabooScraping
       else
         @table.search("td").map{|attr|attr.text}
       end
+    end
+
+  end
+
+  class Row
+    def initialize(line)
+      @line = line
+    end
+    
+    def linkuri?
+      @line.attributes.has_value?("href")
+    end
+
+    def value?
+      !linkuri?
     end
 
     def link
