@@ -24,7 +24,7 @@ class AkabooScraping
     rowspan = nil
     date = nil
     local = nil
-    header = [:date, :location, :bosyu, :sankahi, :edit_limit_date, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
+    header = [:date, :location, :title, :uri, :regist_cout, :fee, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
 
     read.xpath("//table[5]").search("tr").each do |table|
       table = Table.new(table)
@@ -34,6 +34,7 @@ class AkabooScraping
         rowspan = nil
         date = table.line[0].split(/\s/)[0]
         local = table.line[0].split(/\s/)[1]
+        uri = table.children.search("td/a[@href]").text.split(/\s/)[4]
         next
       end
 
@@ -44,7 +45,7 @@ class AkabooScraping
         else
           line = [line[0], rowspan] + line[1..-1]
         end
-        line = [[date, local] + line].flatten
+        line = [[date, local,] + line].flatten
 
         tables << Hash[*(header.zip(line).flatten)]
       end
