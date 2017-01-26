@@ -24,6 +24,7 @@ class AkabooScraping
     rowspan = nil
     date = nil
     local = nil
+    uri = nil
     header = [:date, :location, :title, :uri, :regist_cout, :fee, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
 
     read.xpath("//table[5]").search("tr").each do |table|
@@ -34,7 +35,7 @@ class AkabooScraping
         rowspan = nil
         date = table.line[0].split(/\s/)[0]
         local = table.line[0].split(/\s/)[1]
-        uri = table.link[0].split(/\s/)[4]
+        uri = table.link.split(/\s/)[3]
         next
       end
 
@@ -76,7 +77,7 @@ class AkabooScraping
     end
 
     def link
-      @table.search("td/a[@href]").map{|attr|attr.text}
+      @table.search("td").search("a").attribute("href").value
     end
   end
 end
