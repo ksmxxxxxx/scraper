@@ -1,7 +1,6 @@
 require "open-uri"
 require "nokogiri"
 
-
 class AkabooScraping
   def url
     'http://www.akaboo.jp/event/'
@@ -25,7 +24,7 @@ class AkabooScraping
     date = nil
     local = nil
     uri = nil
-    header = [:date, :location, :title, :uri, :regist_cout, :fee, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
+    header = [:date, :location, :uri, :title, :regist_cout, :fee, :last_limit_date, :nomal_admittance, :cut_type, :etc_info]
 
     read.xpath("//table[5]").search("tr").each do |t|
       table = Table.new(t)
@@ -35,7 +34,6 @@ class AkabooScraping
         rowspan = nil
         date = table.line[0].split(/\s/)[0]
         local = table.line[0].split(/\s/)[1]
-        uri = table.link.split(/\s/)[3]
         next
       end
 
@@ -69,30 +67,33 @@ class AkabooScraping
     end
 
     def line
-      if header?
-        @table.search("td").search("b").map{|attr|attr.text}
+      row = TableRow.new(@table)
+      link = row.link
+      if link.nil?
+        row.texts
       else
-        @table.search("td").map{|attr|attr.text}
+        [link] + row.texts[0..1]
       end
     end
-
   end
 
-  class Row
+  class TableRow
     def initialize(line)
       @line = line
     end
-    
-    def linkuri?
-      @line.attributes.has_value?("href")
+
+    def fields
+      @line.search("td").to_a
     end
 
-    def value?
-      !linkuri?
+    def texts
+      fields.map{|attr|attr.text}
     end
 
     def link
-      @table.search("td").search("a").attribute("href").value
+      return @line.search("a").attribute("href").value
+    rescue
+      return nil
     end
   end
 end
